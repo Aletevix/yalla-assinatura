@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Assinatura — Yalla</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1B2D5B;
+    --gold: #F5A623;
+    --gold-dark: #d4891a;
+    --bg: #F4F6FA;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7494;
+    --border: #e2e6f0;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(27,45,91,0.10);
+  }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--navy);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-weight: 500;
+  }
+
+  .header-badge {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    background: var(--navy);
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-header .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .panel-body { padding: 20px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 18px 0 10px;
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .field { margin-bottom: 12px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: 'Sora', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #fafbfd;
+    color: var(--text);
+    transition: border-color 0.18s, box-shadow 0.18s;
+    outline: none;
+  }
+
+  input[type="text"]:focus, input[type="email"]:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(27,45,91,0.10);
+    background: #fff;
+  }
+
+  .photo-input-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .photo-input-wrap input { flex: 1; }
+
+  .photo-preview {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--gold);
+  }
+
+  .photo-preview img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #243a73; }
+
+  .btn-gold {
+    background: var(--gold);
+    color: #fff;
+  }
+
+  .btn-gold:hover { background: var(--gold-dark); }
+
+  .btn:active { transform: scale(0.97); }
+
+  .copy-toast {
+    font-size: 12px;
+    color: #2a7a4b;
+    background: #e8f7ef;
+    border: 1px solid #b8e8cc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    display: none;
+    text-align: center;
+  }
+
+  .right-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .preview-box {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .preview-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .preview-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  #sig-preview { min-width: 520px; }
+
+  .code-panel {
+    background: #1a1d2e;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .code-header {
+    background: #13152a;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .code-header span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    font-family: monospace;
+  }
+
+  .code-copy-btn {
+    font-size: 11px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    color: var(--gold);
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .code-copy-btn:hover { background: rgba(245,166,35,0.22); }
+
+  #code-output {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #a8d8a8;
+    padding: 16px;
+    max-height: 180px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .how-to {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .how-to h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  .steps { list-style: none; }
+
+  .steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .step-num {
+    background: var(--navy);
+    color: #fff;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="18" cy="14" rx="9" ry="6" fill="#F5A623"/>
+      <ellipse cx="18" cy="24" rx="6" ry="8" fill="#F5A623"/>
+      <ellipse cx="11" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/>
+      <ellipse cx="25" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/>
+    </svg>
+    <div>
+      <div class="logo-text">YALLA</div>
+      <div class="logo-sub">SEMPRE EM FRENTE</div>
+    </div>
+  </div>
+  <div class="header-badge">Gerador de Assinatura de E-mail</div>
+</header>
+
+<main>
+  <!-- Formulário -->
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Seus dados</div>
+    <div class="panel-body">
+
+      <div class="section-label">Identificação</div>
+
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="f-nome" placeholder="Ex: Leonardo Fava" oninput="render()">
+      </div>
+
+      <div class="field">
+        <label>Cargo</label>
+        <input type="text" id="f-cargo" placeholder="Ex: Cargo Financeiro" oninput="render()">
+      </div>
+
+      <div class="field">
+        <label>Frase motivacional (opcional)</label>
+        <input type="text" id="f-frase" placeholder='Ex: "Sempre em frente".' oninput="render()">
+      </div>
+
+      <div class="section-label">Contato</div>
+
+      <div class="field">
+        <label>E-mail</label>
+        <input type="text" id="f-email" placeholder="nome@int.yallacar.com.br" oninput="render()">
+      </div>
+
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="text" id="f-whats" placeholder="(11) 9 0000-0000" oninput="render()">
+      </div>
+
+      <div class="section-label">Foto</div>
+
+      <div class="field">
+        <label>URL da sua foto (hospedada online)</label>
+        <div class="photo-input-wrap">
+          <input type="text" id="f-foto" placeholder="https://..." oninput="updatePhoto()">
+          <div class="photo-preview" id="photo-prev">
+            <img id="photo-img" src="" alt="">
+            <span id="photo-initials">?</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="copyHTML()">Copiar HTML</button>
+        <button class="btn btn-gold" onclick="downloadHTML()">Baixar .html</button>
+      </div>
+
+      <div class="copy-toast" id="toast">✓ HTML copiado! Cole no editor de assinatura do seu e-mail.</div>
+
+    </div>
+  </div>
+
+  <!-- Coluna direita -->
+  <div class="right-col">
+
+    <!-- Preview -->
+    <div class="preview-box">
+      <div class="preview-title">Prévia da assinatura</div>
+      <div id="sig-preview"></div>
+    </div>
+
+    <!-- Código -->
+    <div class="code-panel">
+      <div class="code-header">
+        <span>assinatura.html</span>
+        <button class="code-copy-btn" onclick="copyHTML()">Copiar código</button>
+      </div>
+      <pre id="code-output"></pre>
+    </div>
+
+    <!-- Como usar -->
+    <div class="how-to">
+      <h3>Como usar no seu e-mail</h3>
+      <ul class="steps">
+        <li><span class="step-num">1</span> Preencha seus dados ao lado e copie o HTML</li>
+        <li><span class="step-num">2</span> <strong style="color:var(--navy)">Gmail:</strong> Configurações → Ver todas → Assinatura → colar no modo HTML</li>
+        <li><span class="step-num">3</span> <strong style="color:var(--navy)">Outlook:</strong> Arquivo → Opções → Email → Assinaturas → Novo → colar HTML</li>
+        <li><span class="step-num">4</span> Salve e envie um e-mail de teste para conferir</li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const ADDR = "Av. Washington Luís, 6675 . Sala 703 . Vila Congonhas, São Paulo";
+const TEL  = "0800 080 0144";
+const SITE = "www.yallacar.com.br";
+
+const SOCIALS = [
+  { name:"Facebook",  color:"#1877F2", path:"M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z", stroke:false },
+  { name:"Instagram", color:"#E1306C", path:"M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z", stroke:true },
+  { name:"X",         color:"#000000", path:"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z", stroke:false },
+  { name:"YouTube",   color:"#FF0000", path:"M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98l5.75 3.02-5.75 3.02z", stroke:false },
+  { name:"LinkedIn",  color:"#0A66C2", path:"M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z", stroke:false },
+  { name:"WhatsApp",  color:"#25D366", path:"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12.05 2.025C6.495 2.025 2 6.52 2 12.075c0 1.9.523 3.7 1.434 5.226L2 22l4.853-1.411A10.05 10.05 0 0 0 12.05 22C17.605 22 22 17.505 22 11.95c0-5.555-4.395-9.925-9.95-9.925z", stroke:false },
+  { name:"TikTok",    color:"#000000", path:"M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z", stroke:false }
+];
+
+function svgIcon(s) {
+  if (s.stroke) return `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${s.path}"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="${s.color}"><path d="${s.path}"/></svg>`;
+}
+
+function getInitials(nome) {
+  return nome.trim().split(' ').map(w => w[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || '?';
+}
+
+function buildSig(nome, cargo, frase, email, whats, foto) {
+  nome  = nome  || 'Seu Nome';
+  cargo = cargo || 'Seu Cargo';
+  email = email || 'email@int.yallacar.com.br';
+  whats = whats || '(11) 9 0000-0000';
+
+  const fotoHtml = foto
+    ? `<img src="${foto}" width="80" height="80" style="border-radius:50%;object-fit:cover;display:block;">`
+    : `<div style="width:80px;height:80px;border-radius:50%;background:#1B2D5B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${getInitials(nome)}</div>`;
+
+  const socialsBtns = SOCIALS.map(s =>
+    `<a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fff;margin-right:3px;vertical-align:middle;text-decoration:none;">${svgIcon(s)}</a>`
+  ).join('');
+
+  const fraseHtml = frase
+    ? `<br><em style="color:#888888;font-size:12px;font-style:italic;">${frase}</em>`
+    : '';
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333333;max-width:600px;width:100%;background:#ffffff;">
+  <tr>
+    <td colspan="3" style="background:#1B2D5B;height:5px;border-radius:4px 4px 0 0;font-size:0;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="padding:16px 12px 16px 16px;vertical-align:middle;width:96px;">
+      ${fotoHtml}
+    </td>
+    <td style="padding:16px 14px;vertical-align:middle;border-right:3px solid #F5A623;white-space:nowrap;">
+      <strong style="font-size:14px;color:#1B2D5B;display:block;margin-bottom:3px;">${nome}</strong>
+      <span style="color:#666666;font-size:12px;">${cargo}</span>
+      ${fraseHtml}
+    </td>
+    <td style="padding:16px 20px 16px 20px;vertical-align:middle;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="padding-bottom:6px;white-space:nowrap;">
+          <span style="font-size:14px;">&#128205;</span>&nbsp;<span style="color:#555555;font-size:12px;">${ADDR}</span>
+        </td></tr>
+        <tr><td style="padding-bottom:6px;white-space:nowrap;">
+          <span style="font-size:14px;">&#128241;</span>&nbsp;<span style="color:#555555;font-size:12px;">${whats}</span>
+        </td></tr>
+        <tr><td style="padding-bottom:6px;white-space:nowrap;">
+          <span style="font-size:14px;">&#128222;</span>&nbsp;<span style="color:#555555;font-size:12px;">${TEL}</span>
+        </td></tr>
+        <tr><td style="white-space:nowrap;">
+          <span style="font-size:14px;">&#9993;</span>&nbsp;<a href="mailto:${email}" style="color:#1B2D5B;font-size:12px;text-decoration:none;">${email}</a>
+        </td></tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3" style="background:#1B2D5B;padding:8px 16px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle;">
+            <span style="color:#aaaacc;font-size:11px;margin-right:4px;">Nossas redes:</span>
+            ${socialsBtns}
+          </td>
+          <td style="text-align:right;vertical-align:middle;">
+            <span style="color:#ffffff;font-size:15px;font-weight:700;letter-spacing:2px;">YALLA</span>
+            <br><span style="color:#F5A623;font-size:10px;letter-spacing:2px;">SEMPRE EM FRENTE</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3" style="background:#F5A623;padding:6px 16px;border-radius:0 0 4px 4px;">
+      <a href="https://${SITE}" style="color:#ffffff;font-size:12px;text-decoration:none;font-weight:700;">${SITE}</a>
+    </td>
+  </tr>
+</table>`;
+}
+
+function getFields() {
+  return {
+    nome:  document.getElementById('f-nome').value.trim(),
+    cargo: document.getElementById('f-cargo').value.trim(),
+    frase: document.getElementById('f-frase').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    whats: document.getElementById('f-whats').value.trim(),
+    foto:  document.getElementById('f-foto').value.trim(),
+  };
+}
+
+function render() {
+  const f = getFields();
+  const sig = buildSig(f.nome, f.cargo, f.frase, f.email, f.whats, f.foto);
+  document.getElementById('sig-preview').innerHTML = sig;
+  document.getElementById('code-output').textContent = sig;
+  updateInitials(f.nome);
+}
+
+function updateInitials(nome) {
+  document.getElementById('photo-initials').textContent = getInitials(nome) || '?';
+}
+
+function updatePhoto() {
+  const url = document.getElementById('f-foto').value.trim();
+  const img = document.getElementById('photo-img');
+  const initials = document.getElementById('photo-initials');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    initials.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    initials.style.display = 'block';
+  }
+  render();
+}
+
+function copyHTML() {
+  const sig = buildSig(...Object.values(getFields()));
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(sig).then(showToast);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = sig;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  }
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 4000);
+}
+
+function downloadHTML() {
+  const f = getFields();
+  const sig = buildSig(f.nome, f.cargo, f.frase, f.email, f.whats, f.foto);
+  const full = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Assinatura ${f.nome || 'Yalla'}</title></head><body style="margin:0;padding:20px;background:#f0f0f0;">${sig}</body></html>`;
+  const blob = new Blob([full], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `assinatura-${(f.nome || 'yalla').toLowerCase().replace(/\s+/g,'-')}.html`;
+  a.click();
+}
+
+render();
+</script>
+</body>
+</html>
