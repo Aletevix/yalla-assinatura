@@ -49,6 +49,15 @@ function getInitials(nome) {
   return nome.trim().split(' ').map((word) => word[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
 }
 
+function maskWhatsapp(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 3) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
 function buildSig(fields) {
   const nomeRaw = fields.nome || 'Seu Nome';
   const cargoRaw = fields.cargo || 'Seu Cargo';
@@ -217,7 +226,7 @@ function App() {
             <div className="section-label">Contato</div>
 
             <Field label="E-mail" type="email" value={form.email} placeholder="nome@int.yallacar.com.br" onChange={(value) => updateField('email', value)} />
-            <Field label="WhatsApp" value={form.whats} placeholder="(11) 9 0000-0000" onChange={(value) => updateField('whats', value)} />
+            <Field label="WhatsApp" value={form.whats} placeholder="(11) 9 0000-0000" inputMode="numeric" maxLength={16} onChange={(value) => updateField('whats', maskWhatsapp(value))} />
 
             <div className="section-label">Foto</div>
 
@@ -285,13 +294,21 @@ function App() {
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = 'text' }) {
+function Field({ label, value, onChange, placeholder, type = 'text', inputMode, maxLength }) {
   const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        maxLength={maxLength}
+        onChange={(event) => onChange(event.target.value)}
+      />
     </div>
   );
 }
