@@ -4,7 +4,7 @@ import yallaLogoUrl from './assets/yalla_logo.webp';
 import './styles.css';
 
 const ADDR = 'Av. Washington Luís, 6675 . Sala 703 . Vila Congonhas, São Paulo';
-const TEL = '0800 080 0144';
+const TEL = '0800 504 0162';
 const SITE = 'www.yallacar.com.br';
 const OFFICIAL_LOGO_URL = 'https://yallacar.com.br/_next/image?q=75&url=%2Fimages%2Fimage-26.webp&w=384';
 
