@@ -391,11 +391,20 @@
 
 <header>
   <div class="logo">
-    <svg class="logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="18" cy="14" rx="9" ry="6" fill="#F5A623"/>
-      <ellipse cx="18" cy="24" rx="6" ry="8" fill="#F5A623"/>
-      <ellipse cx="11" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/>
-      <ellipse cx="25" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/>
+    <svg class="logo-icon" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="52" cy="52" rx="26" ry="16" fill="#F5A623"/>
+      <ellipse cx="40" cy="38" rx="12" ry="10" fill="#F5A623"/>
+      <ellipse cx="60" cy="34" rx="10" ry="9" fill="#F5A623"/>
+      <rect x="63" y="28" width="10" height="24" rx="5" fill="#F5A623"/>
+      <ellipse cx="72" cy="23" rx="9" ry="7" fill="#F5A623"/>
+      <ellipse cx="80" cy="25" rx="5" ry="4" fill="#F5A623"/>
+      <ellipse cx="67" cy="16" rx="3" ry="5" fill="#F5A623"/>
+      <circle cx="75" cy="20" r="1.5" fill="#1B2D5B"/>
+      <rect x="60" y="64" width="7" height="14" rx="3" fill="#F5A623"/>
+      <rect x="70" y="64" width="7" height="14" rx="3" fill="#F5A623"/>
+      <rect x="38" y="64" width="7" height="14" rx="3" fill="#F5A623"/>
+      <rect x="48" y="64" width="7" height="14" rx="3" fill="#F5A623"/>
+      <path d="M26 50 Q18 45 20 38 Q22 32 26 35" stroke="#F5A623" stroke-width="4" fill="none" stroke-linecap="round"/>
     </svg>
     <div>
       <div class="logo-text">YALLA</div>
@@ -494,8 +503,8 @@
       <h3>Como usar no seu e-mail</h3>
       <ul class="steps">
         <li><span class="step-num">1</span> Preencha seus dados ao lado e copie o HTML</li>
-        <li><span class="step-num">2</span> <strong style="color:var(--navy)">Gmail:</strong> Configurações → Ver todas → Assinatura → colar no modo HTML</li>
-        <li><span class="step-num">3</span> <strong style="color:var(--navy)">Outlook:</strong> Arquivo → Opções → Email → Assinaturas → Novo → colar HTML</li>
+        <li><span class="step-num">2</span> <strong style="color:var(--navy)">Gmail:</strong> Configurações &rarr; Ver todas &rarr; Assinatura &rarr; colar no modo HTML</li>
+        <li><span class="step-num">3</span> <strong style="color:var(--navy)">Outlook:</strong> Arquivo &rarr; Opções &rarr; Email &rarr; Assinaturas &rarr; Novo &rarr; colar HTML</li>
         <li><span class="step-num">4</span> Salve e envie um e-mail de teste para conferir</li>
       </ul>
     </div>
@@ -516,6 +525,9 @@ const SOCIALS = [
   { name:"LinkedIn",  url:"https://www.linkedin.com/company/yallaalugueldecarros/?originalSubdomain=br",   color:"#0A66C2", path:"M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z", stroke:false },
 ];
 
+// Camel SVG icon as inline string for email signature
+const CAMEL_SVG = '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 80\" width=\"26\" height=\"21\"><ellipse cx=\"52\" cy=\"52\" rx=\"26\" ry=\"16\" fill=\"#F5A623\"/><ellipse cx=\"40\" cy=\"38\" rx=\"12\" ry=\"10\" fill=\"#F5A623\"/><ellipse cx=\"60\" cy=\"34\" rx=\"10\" ry=\"9\" fill=\"#F5A623\"/><rect x=\"63\" y=\"28\" width=\"10\" height=\"24\" rx=\"5\" fill=\"#F5A623\"/><ellipse cx=\"72\" cy=\"23\" rx=\"9\" ry=\"7\" fill=\"#F5A623\"/><ellipse cx=\"80\" cy=\"25\" rx=\"5\" ry=\"4\" fill=\"#F5A623\"/><ellipse cx=\"67\" cy=\"16\" rx=\"3\" ry=\"5\" fill=\"#F5A623\"/><circle cx=\"75\" cy=\"20\" r=\"1.5\" fill=\"#1B2D5B\"/><rect x=\"60\" y=\"64\" width=\"7\" height=\"14\" rx=\"3\" fill=\"#F5A623\"/><rect x=\"70\" y=\"64\" width=\"7\" height=\"14\" rx=\"3\" fill=\"#F5A623\"/><rect x=\"38\" y=\"64\" width=\"7\" height=\"14\" rx=\"3\" fill=\"#F5A623\"/><rect x=\"48\" y=\"64\" width=\"7\" height=\"14\" rx=\"3\" fill=\"#F5A623\"/><path d=\"M26 50 Q18 45 20 38 Q22 32 26 35\" stroke=\"#F5A623\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/></svg>';
+
 function svgIcon(s) {
   if (s.stroke) return `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${s.path}"/></svg>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="${s.color}"><path d="${s.path}"/></svg>`;
@@ -524,10 +536,6 @@ function svgIcon(s) {
 function getInitials(nome) {
   return nome.trim().split(' ').map(w => w[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || '?';
 }
-
-// Yalla logo as inline SVG for email (table-safe, uses VML-fallback approach via img tag with data URI is not ideal,
-// so we use a simple HTML text logo with SVG icons side-by-side)
-const YALLA_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 36 36"><ellipse cx="18" cy="14" rx="9" ry="6" fill="#F5A623"/><ellipse cx="18" cy="24" rx="6" ry="8" fill="#F5A623"/><ellipse cx="11" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/><ellipse cx="25" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/></svg>`;
 
 function buildSig(nome, cargo, frase, email, whats, foto) {
   nome  = nome  || 'Seu Nome';
@@ -585,14 +593,12 @@ function buildSig(nome, cargo, frase, email, whats, foto) {
             <span style="color:#aaaacc;font-size:11px;margin-right:4px;">Nossas redes:</span>
             ${socialsBtns}
           </td>
-          <td style="text-align:right;vertical-align:middle;">
+          <td style="text-align:right;vertical-align:middle;white-space:nowrap;">
             <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;margin-left:auto;">
               <tr>
-                <td style="vertical-align:middle;padding-right:8px;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 36 36"><ellipse cx="18" cy="14" rx="9" ry="6" fill="#F5A623"/><ellipse cx="18" cy="24" rx="6" ry="8" fill="#F5A623"/><ellipse cx="11" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/><ellipse cx="25" cy="18" rx="3.5" ry="2" fill="#F5A623" opacity="0.7"/></svg>
-                </td>
+                <td style="vertical-align:middle;padding-right:6px;">${CAMEL_SVG}</td>
                 <td style="vertical-align:middle;text-align:left;">
-                  <span style="color:#ffffff;font-size:15px;font-weight:700;letter-spacing:2px;display:block;">YALLA</span>
+                  <span style="color:#ffffff;font-size:15px;font-weight:700;letter-spacing:2px;display:block;line-height:1.2;">YALLA</span>
                   <span style="color:#F5A623;font-size:10px;letter-spacing:2px;">SEMPRE EM FRENTE</span>
                 </td>
               </tr>
@@ -644,18 +650,15 @@ function handleFileUpload(event) {
   reader.onload = function(e) {
     const base64 = e.target.result;
     window._fotoBase64 = base64;
-    // Limpar campo URL
     document.getElementById('f-foto').value = '';
-    // Atualizar preview
     const img = document.getElementById('photo-img');
     const initials = document.getElementById('photo-initials');
     img.src = base64;
     img.style.display = 'block';
     initials.style.display = 'none';
-    // Mostrar nome do arquivo
     const info = document.getElementById('foto-file-info');
     const nameSpan = document.getElementById('foto-file-name');
-    nameSpan.textContent = '\u{1F4F7} ' + file.name;
+    nameSpan.textContent = file.name;
     info.style.display = 'flex';
     render();
   };
@@ -680,7 +683,6 @@ function updatePhoto() {
   const url = document.getElementById('f-foto').value.trim();
   const img = document.getElementById('photo-img');
   const initials = document.getElementById('photo-initials');
-  // Limpar upload local quando URL manual é digitada
   if (url) {
     window._fotoBase64 = null;
     document.getElementById('f-foto-file').value = '';
