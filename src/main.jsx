@@ -196,16 +196,24 @@ function App() {
     showToast();
   }
 
-  function copyFormatted() {
-    const el = document.getElementById('sig-preview');
-    if (!el) return;
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    document.execCommand('copy');
-    selection.removeAllRanges();
+  async function copyFormatted() {
+    try {
+      const htmlBlob = new Blob([signatureHtml], { type: 'text/html' });
+      const textBlob = new Blob([''], { type: 'text/plain' });
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob }),
+      ]);
+    } catch {
+      const el = document.getElementById('sig-preview');
+      if (!el) return;
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand('copy');
+      selection.removeAllRanges();
+    }
     showToast('Assinatura copiada! Abra o Outlook, va em Assinaturas e cole com Ctrl+V.');
   }
 
