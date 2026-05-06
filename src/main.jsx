@@ -139,6 +139,7 @@ function buildSig(fields) {
 function App() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [toastVisible, setToastVisible] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
   const [outlookModal, setOutlookModal] = useState(null);
   const fileInputRef = useRef(null);
   const signatureHtml = useMemo(() => buildSig(form), [form]);
@@ -173,7 +174,8 @@ function App() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  function showToast() {
+  function showToast(msg) {
+    setToastMsg(msg || 'HTML copiado! Cole no editor de assinatura do seu e-mail.');
     setToastVisible(true);
     window.setTimeout(() => setToastVisible(false), 4000);
   }
@@ -192,6 +194,19 @@ function App() {
     document.execCommand('copy');
     document.body.removeChild(textarea);
     showToast();
+  }
+
+  function copyFormatted() {
+    const el = document.getElementById('sig-preview');
+    if (!el) return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand('copy');
+    selection.removeAllRanges();
+    showToast('Assinatura copiada! Abra o Outlook, va em Assinaturas e cole com Ctrl+V.');
   }
 
   function downloadHTML() {
@@ -274,12 +289,12 @@ function App() {
               <button className="btn btn-gold" type="button" onClick={downloadHTML}>Baixar .html</button>
             </div>
 
-            <button className="btn btn-outlook" type="button" onClick={exportToOutlook}>
+            <button className="btn btn-outlook" type="button" onClick={copyFormatted}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{verticalAlign:'middle',marginRight:6}}><rect x="2" y="4" width="20" height="16" rx="2" fill="#0078D4"/><path d="M2 8l10 7 10-7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              Exportar para Outlook
+              Copiar para Outlook
             </button>
 
-            <div className={`copy-toast ${toastVisible ? 'is-visible' : ''}`}>HTML copiado! Cole no editor de assinatura do seu e-mail.</div>
+            <div className={`copy-toast ${toastVisible ? 'is-visible' : ''}`}>{toastMsg}</div>
             {outlookModal && <OutlookModal filename={outlookModal} onClose={() => setOutlookModal(null)} />}
           </div>
         </section>
@@ -305,11 +320,11 @@ function App() {
               <span className="how-to-badge how-to-badge--outlook">Outlook</span>
             </div>
             <ol className="steps">
-              <Step number="1">Preencha seus dados e clique em <strong>Exportar para Outlook</strong></Step>
-              <Step number="2">O arquivo <code>.htm</code> sera baixado automaticamente</Step>
-              <Step number="3">Pressione <strong>Win + R</strong>, digite <code>%APPDATA%\Microsoft\Signatures</code> e pressione Enter</Step>
-              <Step number="4">Mova o arquivo <code>.htm</code> baixado para essa pasta</Step>
-              <Step number="5">Abra o Outlook &#8594; <strong>Arquivo &#8594; Opcoes &#8594; Email &#8594; Assinaturas</strong>, selecione a assinatura e clique em OK</Step>
+              <Step number="1">Preencha seus dados e clique em <strong>Copiar para Outlook</strong></Step>
+              <Step number="2">No Outlook va em <strong>Arquivo &#8594; Opcoes &#8594; Email &#8594; Assinaturas</strong></Step>
+              <Step number="3">Clique em <strong>Novo</strong>, coloque um nome e confirme</Step>
+              <Step number="4">Clique dentro da caixa de texto da assinatura e cole com <strong>Ctrl+V</strong></Step>
+              <Step number="5">Clique em <strong>OK</strong> para salvar</Step>
             </ol>
 
             <div className="how-to-section-label" style={{marginTop: '16px'}}>
