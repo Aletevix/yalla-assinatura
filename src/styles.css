@@ -546,6 +546,29 @@ kbd {
   box-shadow: var(--shadow);
 }
 
+.how-to-section-label {
+  margin-bottom: 10px;
+}
+
+.how-to-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: #fff;
+}
+
+.how-to-badge--outlook {
+  background: #0078D4;
+}
+
+.how-to-badge--gmail {
+  background: #EA4335;
+}
+
 .how-to h3 {
   font-size: 13px;
   font-weight: 600;

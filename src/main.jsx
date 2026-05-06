@@ -300,11 +300,25 @@ function App() {
 
           <div className="how-to">
             <h3>Como usar no seu e-mail</h3>
+
+            <div className="how-to-section-label">
+              <span className="how-to-badge how-to-badge--outlook">Outlook</span>
+            </div>
             <ol className="steps">
-              <Step number="1">Preencha seus dados ao lado e copie o HTML</Step>
-              <Step number="2"><strong>Gmail:</strong> Configuracoes, Ver todas, Assinatura, colar no modo HTML</Step>
-              <Step number="3"><strong>Outlook:</strong> Arquivo, Opcoes, Email, Assinaturas, Novo, colar HTML</Step>
-              <Step number="4">Salve e envie um e-mail de teste para conferir</Step>
+              <Step number="1">Preencha seus dados e clique em <strong>Exportar para Outlook</strong></Step>
+              <Step number="2">O arquivo <code>.htm</code> sera baixado automaticamente</Step>
+              <Step number="3">Pressione <strong>Win + R</strong>, digite <code>%APPDATA%\Microsoft\Signatures</code> e pressione Enter</Step>
+              <Step number="4">Mova o arquivo <code>.htm</code> baixado para essa pasta</Step>
+              <Step number="5">Abra o Outlook &#8594; <strong>Arquivo &#8594; Opcoes &#8594; Email &#8594; Assinaturas</strong>, selecione a assinatura e clique em OK</Step>
+            </ol>
+
+            <div className="how-to-section-label" style={{marginTop: '16px'}}>
+              <span className="how-to-badge how-to-badge--gmail">Gmail</span>
+            </div>
+            <ol className="steps">
+              <Step number="1">Preencha seus dados e clique em <strong>Copiar HTML</strong></Step>
+              <Step number="2">No Gmail va em <strong>Configuracoes &#8594; Ver todas &#8594; Assinatura</strong></Step>
+              <Step number="3">Clique em <strong>Novo</strong>, cole o HTML no modo de edicao e salve</Step>
             </ol>
           </div>
         </section>
