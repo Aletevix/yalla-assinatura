@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import yallaLogoUrl from './assets/yalla_logo.webp';
 import './styles.css';
@@ -35,12 +35,36 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function svgIcon(social) {
-  const common = `xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"`;
-  if (social.stroke) {
-    return `<svg ${common} fill="none" stroke="${social.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${social.path}"/></svg>`;
-  }
-  return `<svg ${common} fill="${social.color}"><path d="${social.path}"/></svg>`;
+function createSocialIconUrl(social) {
+  return new Promise((resolve) => {
+    const size = 40;
+    const iconSvg = social.stroke
+      ? `<svg x="8" y="8" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${social.path}"/></svg>`
+      : `<svg x="8" y="8" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="${social.path}"/></svg>`;
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}" fill="${social.color}"/>${iconSvg}</svg>`;
+    const img = new Image();
+    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+function socialBadge(social, iconUrl) {
+  const icon = iconUrl
+    ? `<img src="${iconUrl}" width="30" height="30" alt="${social.name}" style="display:block;border:0;">`
+    : `<span style="display:block;width:30px;height:30px;border-radius:15px;background:${social.color};"></span>`;
+  return `<td style="padding:0 5px 0 0;vertical-align:middle;">` +
+    `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:block;text-decoration:none;">${icon}</a>` +
+    `</td>`;
 }
 
 function getInitials(nome) {
@@ -56,7 +80,7 @@ function maskWhatsapp(value) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
-function buildSig(fields) {
+function buildSig(fields, iconUrls = {}) {
   const nomeRaw = fields.nome || 'Seu Nome';
   const cargoRaw = fields.cargo || 'Seu Cargo';
   const emailRaw = fields.email || 'email@int.yallacar.com.br';
@@ -73,9 +97,9 @@ function buildSig(fields) {
     ? `<img src="${foto}" width="80" height="80" alt="${nome}" style="border-radius:50%;object-fit:cover;display:block;">`
     : `<div style="width:80px;height:80px;border-radius:50%;background:#1B2D5B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${getInitials(nomeRaw)}</div>`;
 
-  const socialsBtns = SOCIALS.map((social) =>
-    `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fff;margin-right:3px;vertical-align:middle;text-decoration:none;">${svgIcon(social)}</a>`,
-  ).join('');
+  const socialsBtns = `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>${
+    SOCIALS.map((social) => socialBadge(social, iconUrls[social.name])).join('')
+  }</tr></table>`;
 
   const fraseHtml = frase
     ? `<br><em style="color:#888888;font-size:12px;font-style:italic;">${frase}</em>`
@@ -139,9 +163,15 @@ function App() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [outlookModal, setOutlookModal] = useState(null);
+  const [socialIconUrls, setSocialIconUrls] = useState({});
   const fileInputRef = useRef(null);
-  const signatureHtml = useMemo(() => buildSig(form), [form]);
+  const signatureHtml = useMemo(() => buildSig(form, socialIconUrls), [form, socialIconUrls]);
   const initials = useMemo(() => getInitials(form.nome), [form.nome]);
+
+  useEffect(() => {
+    Promise.all(SOCIALS.map((s) => createSocialIconUrl(s).then((url) => [s.name, url])))
+      .then((entries) => setSocialIconUrls(Object.fromEntries(entries)));
+  }, []);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
