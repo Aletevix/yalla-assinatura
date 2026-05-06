@@ -36,7 +36,12 @@ function escapeHtml(value) {
 }
 
 function socialBadge(social) {
-  return `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:inline-block;width:28px;height:28px;border-radius:50%;background:${social.color};margin-right:4px;text-align:center;line-height:28px;text-decoration:none;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#ffffff;vertical-align:middle;">${social.label}</a>`;
+  return `<td style="padding:0 5px 0 0;">` +
+    `<a href="${social.url}" target="_blank" aria-label="${social.name}" ` +
+    `style="display:block;width:26px;height:26px;border-radius:13px;background:${social.color};` +
+    `text-align:center;line-height:26px;text-decoration:none;font-family:Arial,sans-serif;` +
+    `font-size:10px;font-weight:700;color:#ffffff;mso-line-height-rule:exactly;">${social.label}</a>` +
+    `</td>`;
 }
 
 function getInitials(nome) {
@@ -69,7 +74,7 @@ function buildSig(fields) {
     ? `<img src="${foto}" width="80" height="80" alt="${nome}" style="border-radius:50%;object-fit:cover;display:block;">`
     : `<div style="width:80px;height:80px;border-radius:50%;background:#1B2D5B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${getInitials(nomeRaw)}</div>`;
 
-  const socialsBtns = SOCIALS.map((social) => socialBadge(social)).join('');
+  const socialsBtns = `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;display:inline-table;vertical-align:middle;"><tr>${SOCIALS.map((social) => socialBadge(social)).join('')}</tr></table>`;
 
   const fraseHtml = frase
     ? `<br><em style="color:#888888;font-size:12px;font-style:italic;">${frase}</em>`
