@@ -139,6 +139,7 @@ function buildSig(fields) {
 function App() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [toastVisible, setToastVisible] = useState(false);
+  const [outlookModal, setOutlookModal] = useState(null);
   const fileInputRef = useRef(null);
   const signatureHtml = useMemo(() => buildSig(form), [form]);
   const initials = useMemo(() => getInitials(form.nome), [form.nome]);
@@ -204,6 +205,18 @@ function App() {
     URL.revokeObjectURL(anchor.href);
   }
 
+  function exportToOutlook() {
+    const safeName = (form.nome || 'yalla').toLowerCase().trim().replace(/\s+/g, '-');
+    const filename = `assinatura-${safeName}.htm`;
+    const blob = new Blob([signatureHtml], { type: 'text/html;charset=utf-8' });
+    const anchor = document.createElement('a');
+    anchor.href = URL.createObjectURL(blob);
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(anchor.href);
+    setOutlookModal(filename);
+  }
+
   return (
     <>
       <header className="app-header">
@@ -261,7 +274,13 @@ function App() {
               <button className="btn btn-gold" type="button" onClick={downloadHTML}>Baixar .html</button>
             </div>
 
+            <button className="btn btn-outlook" type="button" onClick={exportToOutlook}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{verticalAlign:'middle',marginRight:6}}><rect x="2" y="4" width="20" height="16" rx="2" fill="#0078D4"/><path d="M2 8l10 7 10-7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              Exportar para Outlook
+            </button>
+
             <div className={`copy-toast ${toastVisible ? 'is-visible' : ''}`}>HTML copiado! Cole no editor de assinatura do seu e-mail.</div>
+            {outlookModal && <OutlookModal filename={outlookModal} onClose={() => setOutlookModal(null)} />}
           </div>
         </section>
 
@@ -319,6 +338,73 @@ function Step({ number, children }) {
       <span className="step-num">{number}</span>
       <span>{children}</span>
     </li>
+  );
+}
+
+function OutlookModal({ filename, onClose }) {
+  const [pathCopied, setPathCopied] = useState(false);
+  const path = '%APPDATA%\\Microsoft\\Signatures';
+
+  async function copyPath() {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(path);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = path;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setPathCopied(true);
+    window.setTimeout(() => setPathCopied(false), 2500);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <span className="modal-title">&#10003; Arquivo baixado com sucesso!</span>
+          <button className="modal-close" type="button" onClick={onClose}>&#10005;</button>
+        </div>
+        <div className="modal-body">
+          <p className="modal-desc">Siga os passos abaixo para instalar a assinatura no Outlook:</p>
+          <ol className="modal-steps">
+            <li>
+              <span className="modal-step-num">1</span>
+              <span>Pressione <kbd>Win</kbd> + <kbd>R</kbd> para abrir o Executar</span>
+            </li>
+            <li>
+              <span className="modal-step-num">2</span>
+              <span>
+                Digite o caminho abaixo e pressione <kbd>Enter</kbd>:
+                <div className="modal-path-row">
+                  <code className="modal-path">{path}</code>
+                  <button className="modal-copy-path" type="button" onClick={copyPath}>
+                    {pathCopied ? '&#10003; Copiado' : 'Copiar'}
+                  </button>
+                </div>
+              </span>
+            </li>
+            <li>
+              <span className="modal-step-num">3</span>
+              <span>Mova o arquivo <strong>{filename}</strong> para essa pasta</span>
+            </li>
+            <li>
+              <span className="modal-step-num">4</span>
+              <span>Abra o Outlook &#8594; <strong>Arquivo &#8594; Opções &#8594; Email &#8594; Assinaturas</strong></span>
+            </li>
+            <li>
+              <span className="modal-step-num">5</span>
+              <span>Selecione a assinatura e clique em <strong>OK</strong></span>
+            </li>
+          </ol>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-primary" type="button" onClick={onClose}>Entendido</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
