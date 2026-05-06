@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import yallaLogoUrl from './assets/yalla_logo.webp';
 import './styles.css';
@@ -35,13 +35,36 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function socialBadge(social) {
+function createIconDataUrl(color, label) {
+  try {
+    const size = 36;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${label.length > 1 ? 12 : 16}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label.toUpperCase(), size / 2, size / 2 + 1);
+    return canvas.toDataURL('image/png');
+  } catch {
+    return null;
+  }
+}
+
+function socialBadge(social, iconUrl) {
+  const icon = iconUrl
+    ? `<img src="${iconUrl}" width="30" height="30" alt="${social.name}" style="display:block;border:0;">`
+    : `<span style="display:block;width:30px;height:30px;background:${social.color};border-radius:15px;text-align:center;line-height:30px;font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#fff;">${social.label}</span>`;
   return `<td style="padding:0 5px 0 0;">` +
-    `<a href="${social.url}" target="_blank" aria-label="${social.name}" ` +
-    `style="display:block;width:26px;height:26px;border-radius:13px;background:${social.color};` +
-    `text-align:center;line-height:26px;text-decoration:none;font-family:Arial,sans-serif;` +
-    `font-size:10px;font-weight:700;color:#ffffff;mso-line-height-rule:exactly;">${social.label}</a>` +
-    `</td>`;
+    `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:block;text-decoration:none;">` +
+    icon +
+    `</a></td>`;
 }
 
 function getInitials(nome) {
@@ -57,7 +80,7 @@ function maskWhatsapp(value) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
-function buildSig(fields) {
+function buildSig(fields, iconUrls = {}) {
   const nomeRaw = fields.nome || 'Seu Nome';
   const cargoRaw = fields.cargo || 'Seu Cargo';
   const emailRaw = fields.email || 'email@int.yallacar.com.br';
@@ -74,7 +97,7 @@ function buildSig(fields) {
     ? `<img src="${foto}" width="80" height="80" alt="${nome}" style="border-radius:50%;object-fit:cover;display:block;">`
     : `<div style="width:80px;height:80px;border-radius:50%;background:#1B2D5B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${getInitials(nomeRaw)}</div>`;
 
-  const socialsBtns = `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;display:inline-table;vertical-align:middle;"><tr>${SOCIALS.map((social) => socialBadge(social)).join('')}</tr></table>`;
+  const socialsBtns = `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>${SOCIALS.map((social) => socialBadge(social, iconUrls[social.name])).join('')}</tr></table>`;
 
   const fraseHtml = frase
     ? `<br><em style="color:#888888;font-size:12px;font-style:italic;">${frase}</em>`
@@ -138,9 +161,16 @@ function App() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [outlookModal, setOutlookModal] = useState(null);
+  const [socialIconUrls, setSocialIconUrls] = useState({});
   const fileInputRef = useRef(null);
-  const signatureHtml = useMemo(() => buildSig(form), [form]);
+  const signatureHtml = useMemo(() => buildSig(form, socialIconUrls), [form, socialIconUrls]);
   const initials = useMemo(() => getInitials(form.nome), [form.nome]);
+
+  useEffect(() => {
+    const urls = {};
+    SOCIALS.forEach((s) => { urls[s.name] = createIconDataUrl(s.color, s.label); });
+    setSocialIconUrls(urls);
+  }, []);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
