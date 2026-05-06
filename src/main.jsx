@@ -9,11 +9,11 @@ const SITE = 'www.yallacar.com.br';
 const OFFICIAL_LOGO_URL = 'https://yallacar.com.br/_next/image?q=75&url=%2Fimages%2Fimage-26.webp&w=384';
 
 const SOCIALS = [
-  { name: 'Facebook', url: 'https://www.facebook.com/yallacaar/?locale=pt_BR', color: '#1877F2', path: 'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z', stroke: false },
-  { name: 'Instagram', url: 'https://www.instagram.com/yallaalugueldecarros/', color: '#E1306C', path: 'M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z', stroke: true },
-  { name: 'YouTube', url: 'https://www.youtube.com/@SempreYalla', color: '#FF0000', path: 'M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98l5.75 3.02-5.75 3.02z', stroke: false },
-  { name: 'TikTok', url: 'https://www.tiktok.com/@yallacarlocadora', color: '#000000', path: 'M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z', stroke: false },
-  { name: 'LinkedIn', url: 'https://www.linkedin.com/company/yallaalugueldecarros/?originalSubdomain=br', color: '#0A66C2', path: 'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', stroke: false },
+  { name: 'Facebook',  url: 'https://www.facebook.com/yallacaar/?locale=pt_BR',                          color: '#1877F2', label: 'f'  },
+  { name: 'Instagram', url: 'https://www.instagram.com/yallaalugueldecarros/',                            color: '#E1306C', label: 'ig' },
+  { name: 'YouTube',   url: 'https://www.youtube.com/@SempreYalla',                                       color: '#FF0000', label: 'yt' },
+  { name: 'TikTok',    url: 'https://www.tiktok.com/@yallacarlocadora',                                   color: '#010101', label: 'tt' },
+  { name: 'LinkedIn',  url: 'https://www.linkedin.com/company/yallaalugueldecarros/?originalSubdomain=br', color: '#0A66C2', label: 'in' },
 ];
 
 const INITIAL_FORM = {
@@ -35,14 +35,8 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function svgIcon(social) {
-  const common = `xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"`;
-
-  if (social.stroke) {
-    return `<svg ${common} fill="none" stroke="${social.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${social.path}"/></svg>`;
-  }
-
-  return `<svg ${common} fill="${social.color}"><path d="${social.path}"/></svg>`;
+function socialBadge(social) {
+  return `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:inline-block;width:28px;height:28px;border-radius:50%;background:${social.color};margin-right:4px;text-align:center;line-height:28px;text-decoration:none;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#ffffff;vertical-align:middle;">${social.label}</a>`;
 }
 
 function getInitials(nome) {
@@ -75,9 +69,7 @@ function buildSig(fields) {
     ? `<img src="${foto}" width="80" height="80" alt="${nome}" style="border-radius:50%;object-fit:cover;display:block;">`
     : `<div style="width:80px;height:80px;border-radius:50%;background:#1B2D5B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${getInitials(nomeRaw)}</div>`;
 
-  const socialsBtns = SOCIALS.map((social) =>
-    `<a href="${social.url}" target="_blank" aria-label="${social.name}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fff;margin-right:3px;vertical-align:middle;text-decoration:none;">${svgIcon(social)}</a>`,
-  ).join('');
+  const socialsBtns = SOCIALS.map((social) => socialBadge(social)).join('');
 
   const fraseHtml = frase
     ? `<br><em style="color:#888888;font-size:12px;font-style:italic;">${frase}</em>`
