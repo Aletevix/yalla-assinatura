@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import yallaLogoUrl from './assets/yalla_logo.webp';
 import './styles.css';
 
-const ADDR = 'Av. Washington Luís, 6675 . Sala 703 . Vila Congonhas, São Paulo';
+const ADDR = 'Av. Washington Lu&iacute;s, 6675 . Sala 703 . Vila Congonhas, S&atilde;o Paulo';
 const TEL = '0800 504 0162';
 const SITE = 'www.yallacar.com.br';
 const OFFICIAL_LOGO_URL = 'https://yallacar.com.br/_next/image?q=75&url=%2Fimages%2Fimage-26.webp&w=384';
@@ -225,8 +225,9 @@ function App() {
   }
 
   async function copyFormatted() {
+    const wrappedHtml = `<html><head><meta charset="UTF-8"></head><body>${signatureHtml}</body></html>`;
     try {
-      const htmlBlob = new Blob([signatureHtml], { type: 'text/html' });
+      const htmlBlob = new Blob([wrappedHtml], { type: 'text/html;charset=utf-8' });
       const textBlob = new Blob([''], { type: 'text/plain' });
       await navigator.clipboard.write([
         new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob }),
